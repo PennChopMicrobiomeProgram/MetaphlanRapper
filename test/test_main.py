@@ -14,4 +14,4 @@ class MetaphlanWrapperTest(unittest.TestCase):
         self.assertTrue(os.path.isfile(self.out + ".txt"))
 
 if __name__=="__main__":
-    unittest,main()
+    unittest.main()
