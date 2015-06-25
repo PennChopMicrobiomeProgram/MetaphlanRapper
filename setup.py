@@ -13,5 +13,5 @@ setup(
     author_email='patil.ashwini1091@gmail.com',
     url='https://github.com/PennChopMicrobiomeProgram',
     packages=['phyloprofilerlib'],
-    scripts=['scripts/phyloprofiler.py'],
+    scripts=['phyloprofiler.py'],
     )
