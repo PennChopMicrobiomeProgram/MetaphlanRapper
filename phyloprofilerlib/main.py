@@ -23,14 +23,16 @@ class Metaphlan(object):
             "tax_lev", "s",
             "--mpa_pkl", self.config["mpa_pkl"],
             "--bowtie2db", self.config["bowtie2db"],
+            "--no_map",
             "--nproc", "5",
-            "--bowtie2out", "out.bowtie2.bz2",
             "--input_type", "fastq"]
+    
+    def make_output_handle(self, R1, out_dir):
+        return open(os.path.join(out_dir, "%s.txt" % os.path.splitext(os.path.basename(R1))[0]), 'w')
 
-    def run(self, R1, R2, output):
+    def run(self, R1, R2, out_dir):
         command = self.make_command(R1, R2)
-        subprocess.check_call(command, stdout=output, stderr=subprocess.STDOUT)
-
+        subprocess.check_call(command, stdout=self.make_output_handle(R1, out_dir), stderr=subprocess.STDOUT)
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Runs Metaphlan2.")
@@ -47,8 +49,8 @@ def main(argv=None):
         type=argparse.FileType("w"),
         help="Summary file")
     parser.add_argument(
-        "--output-file", required=True,
-        help="output file")
+        "--output-dir", required=True,
+        help="output directory")
     parser.add_argument(
         "--config-file",
         type=argparse.FileType("r"),
@@ -65,8 +67,11 @@ def main(argv=None):
     args.forward_reads.close()
     args.reverse_reads.close()
 
+    if not os.path.exists(args.output_dir):
+        os.mkdir(args.output_dir)
+
     app = Metaphlan(config)
-    app.run(fwd_fp, rev_fp, open(args.output_file, "w"))
+    app.run(fwd_fp, rev_fp, args.output_dir)
     save_summary(args.summary_file, config)
 
 def save_summary(f, config):
