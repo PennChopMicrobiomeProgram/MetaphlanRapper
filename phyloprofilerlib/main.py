@@ -20,7 +20,7 @@ class Metaphlan(object):
         return [
             "python", self.config["metaphlan_fp"],
             "%s,%s" %(R1, R2),
-            "tax_lev", "\'s\'",
+            "--tax_lev", "\'s\'",
             "--mpa_pkl", self.config["mpa_pkl"],
             "--bowtie2db", self.config["bowtie2db"],
             "--no_map",
