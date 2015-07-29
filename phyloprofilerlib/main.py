@@ -34,6 +34,7 @@ class Metaphlan(object):
         command = self.make_command(R1, R2)
         subprocess.check_call(command, stdout=self.make_output_handle(R1, out_dir), stderr=subprocess.STDOUT)
 
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Runs Metaphlan2.")
     parser.add_argument(
