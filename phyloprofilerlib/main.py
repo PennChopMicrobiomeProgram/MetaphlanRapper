@@ -1,4 +1,5 @@
 import argparse
+import distutils.spawn
 import subprocess
 import os
 import sys
@@ -6,12 +7,29 @@ import json
 
 from phyloprofilerlib.version import __version__
 
-default_config ={
-    "metaphlan_fp": "/home/ashwini/ash/other_softwares/metaphlan2/metaphlan2.py",
-    "mpa_pkl": "/home/ashwini/ash/other_softwares/metaphlan2/db_v20/mpa_v20_m200.pkl",
-    "bowtie2db": "/home/ashwini/ash/other_softwares/metaphlan2/db_v20/mpa_v20_m200",
-    "bowtie2_fp": "bowtie2",
+def make_default_config():
+    config = {
+        "metaphlan_fp": "metaphlan2.py",
+        "mpa_pkl": "mpa_v20_m200.pkl",
+        "bowtie2db": "mpa_v20_m200",
+        "bowtie2_fp": "bowtie2",
     }
+    metaphlan_fp = distutils.spawn.find_executable("metaphlan2.py")
+    if metaphlan_fp is not None:
+        # If the metaphlan2.py script is found in our path, we look
+        # for metaphlan2 data in the directory containing the
+        # script.  Otherwise, we assume the metaphlan2 script and
+        # data are in the current directory.
+        metaphlan_dir = os.path.dirname(metaphlan_fp)
+        config.update({
+            "metaphlan_fp": metaphlan_fp,
+            "mpa_pkl": os.path.join(metaphlan_dir, "db_v20", "mpa_v20_m200.pkl"),
+            "bowtie2db": os.path.join(metaphlan_dir, "db_v20", "mpa_v20_m200"),
+        })
+    bowtie2_fp = distutils.spawn.find_executable("bowtie2")
+    if bowtie2_fp is not None:
+        config.update({"bowtie2_fp": bowtie2_fp})
+    return config
 
 class Metaphlan(object):
     def __init__(self, config):
@@ -58,7 +76,7 @@ def main(argv=None):
         help="JSON configuration file")
     args = parser.parse_args(argv)
 
-    config = default_config.copy()
+    config = make_default_config()
     if args.config_file:
         user_config = json.load(args.config_file)
         config.update(user_config)

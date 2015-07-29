@@ -49,19 +49,6 @@ class MainTests(unittest.TestCase):
         r2.write(ANELLO_R2)
         r2.seek(0)
 
-        metaphlan_dir = \
-            "/Users/bittingerk/Software/biobakery-metaphlan2-901cc5778eed"
-        config = {
-            "metaphlan_fp": os.path.join(metaphlan_dir, "metaphlan2.py"),
-            "mpa_pkl": os.path.join(metaphlan_dir, "db_v20", "mpa_v20_m200.pkl"),
-            "bowtie2db": os.path.join(metaphlan_dir, "db_v20", "mpa_v20_m200"),
-            "bowtie2_fp": "/Users/bittingerk/bin/bowtie2",
-        }
-        
-        config_file = tempfile.NamedTemporaryFile(suffix=".json")
-        json.dump(config, config_file)
-        config_file.seek(0)
-
         summary_fp = os.path.join(self.output_dir, "summary.txt")
         output_dir = os.path.join(self.output_dir, "output")
         print "Output directory:", output_dir
@@ -70,7 +57,6 @@ class MainTests(unittest.TestCase):
             "--reverse-reads", r2.name,
             "--summary-file", summary_fp,
             "--output-dir", output_dir,
-            "--config-file", config_file.name,
         ]
         main(args)
 
@@ -78,7 +64,7 @@ class MainTests(unittest.TestCase):
         observed = open(myoutput_fp).read()
 
         self.assertEqual(observed, ANELLO_OUTPUT)
-        
+
 if __name__=="__main__":
     unittest.main()
 
