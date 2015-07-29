@@ -9,7 +9,8 @@ from phyloprofilerlib.version import __version__
 default_config ={
     "metaphlan_fp": "/home/ashwini/ash/other_softwares/metaphlan2/metaphlan2.py",
     "mpa_pkl": "/home/ashwini/ash/other_softwares/metaphlan2/db_v20/mpa_v20_m200.pkl",
-    "bowtie2db": "/home/ashwini/ash/other_softwares/metaphlan2/db_v20/mpa_v20_m200"
+    "bowtie2db": "/home/ashwini/ash/other_softwares/metaphlan2/db_v20/mpa_v20_m200",
+    "bowtie2_fp": "bowtie2",
     }
 
 class Metaphlan(object):
@@ -20,11 +21,10 @@ class Metaphlan(object):
         return [
             "python", self.config["metaphlan_fp"],
             "%s,%s" %(R1, R2),
-            "--tax_lev", "s",
             "--mpa_pkl", self.config["mpa_pkl"],
             "--bowtie2db", self.config["bowtie2db"],
+            "--bowtie2_exe", self.config["bowtie2_fp"],
             "--no_map",
-            "--nproc", "5",
             "--input_type", "fastq"]
     
     def make_output_handle(self, R1, out_dir):
@@ -32,7 +32,7 @@ class Metaphlan(object):
 
     def run(self, R1, R2, out_dir):
         command = self.make_command(R1, R2)
-        subprocess.check_call(command, stdout=self.make_output_handle(R1, out_dir), stderr=subprocess.STDOUT)
+        subprocess.check_call(command, stdout=self.make_output_handle(R1, out_dir))
 
 
 def main(argv=None):
