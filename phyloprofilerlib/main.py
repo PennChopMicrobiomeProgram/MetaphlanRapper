@@ -32,7 +32,18 @@ class Metaphlan(object):
 
     def run(self, R1, R2, out_dir):
         command = self.make_command(R1, R2)
-        subprocess.check_call(command, stdout=self.make_output_handle(R1, out_dir), stderr=subprocess.STDOUT)
+        output = subprocess.check_output(command, stderr=subprocess.STDOUT)
+        output_lines = output.splitlines()
+        revised_output = self.revise_output(output_lines)
+        with self.make_output_handle(R1, out_dir) as f:
+            for revised_output_line in revised_output:
+                f.write(revised_output_line)
+                f.write("\n")
+
+    def revise_output(self, lines):
+        for line in lines:
+            yield line
+
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Runs Metaphlan2.")
