@@ -19,6 +19,15 @@ class MetaphlanWrapperTest(unittest.TestCase):
         self.r2 = "fake_genome1-R2.fastq"
         self.out = "out"
 
+    def test_revise_output(self):
+        observed = Metaphlan.revise_output(ANELLO_FULL_OUTPUT)
+        self.assertEqual(observed, ANELLO_OUTPUT)
+
+    def test_revise_no_assignments(self):
+        """revise_output should not adjust output if no assignments are made."""
+        self.assertEqual(
+            Metaphlan.revise_output(UNCLASSIFIED_OUTPUT), UNCLASSIFIED_OUTPUT)
+
     def test_main(self):
         app = Metaphlan(self.config)
         observed = app.make_command(self.r1, self.r2)
@@ -872,7 +881,7 @@ TCGTTGTAGTAAATACTGCGTGTCCCGGCAGATCACGCAGTATTTACTACAACGAAGGGGACATTTGAAGCCTATTTTGA
 BC@A@GGGEGGGGFFG>CDF/;E=CD<E/CEEE@FB<D>CGGGGCEGGGGGDECEGGGGG/EDGECCFGGEGGGG00FGG>CFGGEGBGGDG0BFGGGGGGGGGDACDGGG...68.@
 """
 
-ANELLO_OUTPUT = """\
+ANELLO_FULL_OUTPUT = """\
 #SampleID	Metaphlan2_Analysis
 k__Viruses	100.0
 k__Viruses|p__Viruses_noname	100.0
@@ -882,4 +891,14 @@ k__Viruses|p__Viruses_noname|c__Viruses_noname|o__Viruses_noname|f__Anellovirida
 k__Viruses|p__Viruses_noname|c__Viruses_noname|o__Viruses_noname|f__Anelloviridae|g__Alphatorquevirus	100.0
 k__Viruses|p__Viruses_noname|c__Viruses_noname|o__Viruses_noname|f__Anelloviridae|g__Alphatorquevirus|s__Torque_teno_virus_1	100.0
 k__Viruses|p__Viruses_noname|c__Viruses_noname|o__Viruses_noname|f__Anelloviridae|g__Alphatorquevirus|s__Torque_teno_virus_1|t__PRJNA15247	100.0
+"""
+
+UNCLASSIFIED_OUTPUT = """\
+#SampleID	Metaphlan2_Analysis
+unclassified	100.0
+"""
+
+ANELLO_OUTPUT = """\
+#SampleID	Metaphlan2_Analysis
+k__Viruses|p__Viruses_noname|c__Viruses_noname|o__Viruses_noname|f__Anelloviridae|g__Alphatorquevirus|s__Torque_teno_virus_1	100.0
 """

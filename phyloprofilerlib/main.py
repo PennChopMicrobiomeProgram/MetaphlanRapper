@@ -52,7 +52,25 @@ class Metaphlan(object):
 
     def run(self, R1, R2, out_dir):
         command = self.make_command(R1, R2)
-        subprocess.check_call(command, stdout=self.make_output_handle(R1, out_dir))
+        output = subprocess.check_output(command)
+        revised_output = self.revise_output(output)
+        with self.make_output_handle(R1, out_dir) as f:
+            f.write(revised_output)
+
+    @staticmethod
+    def revise_output(output):
+        output_lines = output.splitlines(True)
+        if len(output_lines) < 2:
+            raise ValueError("Output has fewer than 2 lines.")
+        elif len(output_lines) == 2:
+            return output
+        else:
+            header = output_lines.pop(0)
+            revised_output_lines = [header]
+            for line in output_lines:
+                if ("s__" in line) and not ("t__" in line):
+                    revised_output_lines.append(line)
+            return "".join(revised_output_lines)
 
 
 def main(argv=None):
