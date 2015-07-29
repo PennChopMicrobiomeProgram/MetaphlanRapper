@@ -7,6 +7,7 @@ import json
 
 from phyloprofilerlib.version import __version__
 
+
 def make_default_config():
     config = {
         "metaphlan_fp": "metaphlan2.py",
@@ -30,6 +31,7 @@ def make_default_config():
     if bowtie2_fp is not None:
         config.update({"bowtie2_fp": bowtie2_fp})
     return config
+
 
 class Metaphlan(object):
     def __init__(self, config):

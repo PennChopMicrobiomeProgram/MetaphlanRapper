@@ -10,10 +10,10 @@ from phyloprofilerlib.main import Metaphlan, main
 class MetaphlanWrapperTest(unittest.TestCase):
     def setUp(self):
         self.config = {
-            "metaphlan_fp": "metaphlan2.py",
-            "mpa_pkl": "mpa_v20_m200.pkl",
-            "bowtie2db": "mpa_v20_m200",
-            "bowtie2_fp": "bowtie2",
+            "metaphlan_fp": "/opt/metaphlan2.py",
+            "mpa_pkl": "/dir2/mpa_v20_m200.pkl",
+            "bowtie2db": "dir3/mpa_v20_m200",
+            "bowtie2_fp": "custom_bowtie2",
         }
         self.r1 = "fake_genome1-R1.fastq"
         self.r2 = "fake_genome1-R2.fastq"
@@ -23,11 +23,11 @@ class MetaphlanWrapperTest(unittest.TestCase):
         app = Metaphlan(self.config)
         observed = app.make_command(self.r1, self.r2)
         expected = [
-            'python', 'metaphlan2.py',
+            'python', '/opt/metaphlan2.py',
             'fake_genome1-R1.fastq,fake_genome1-R2.fastq',
-            '--mpa_pkl', 'mpa_v20_m200.pkl',
-            '--bowtie2db', 'mpa_v20_m200',
-            '--bowtie2_exe', 'bowtie2',
+            '--mpa_pkl', '/dir2/mpa_v20_m200.pkl',
+            '--bowtie2db', 'dir3/mpa_v20_m200',
+            '--bowtie2_exe', 'custom_bowtie2',
             '--no_map',
             '--input_type', 'fastq',
         ]
@@ -51,7 +51,6 @@ class MainTests(unittest.TestCase):
 
         summary_fp = os.path.join(self.output_dir, "summary.txt")
         output_dir = os.path.join(self.output_dir, "output")
-        print "Output directory:", output_dir
         args = [
             "--forward-reads", r1.name,
             "--reverse-reads", r2.name,
@@ -59,11 +58,10 @@ class MainTests(unittest.TestCase):
             "--output-dir", output_dir,
         ]
         main(args)
-
         myoutput_fp = os.path.join(output_dir, os.listdir(output_dir)[0])
         observed = open(myoutput_fp).read()
-
         self.assertEqual(observed, ANELLO_OUTPUT)
+
 
 if __name__=="__main__":
     unittest.main()
