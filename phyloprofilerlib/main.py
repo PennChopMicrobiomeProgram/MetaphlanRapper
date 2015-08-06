@@ -8,7 +8,7 @@ import json
 from phyloprofilerlib.version import __version__
 
 
-def make_default_config():
+def get_config(user_config_file):
     config = {
         "metaphlan_fp": "metaphlan2.py",
         "mpa_pkl": "mpa_v20_m200.pkl",
@@ -30,6 +30,16 @@ def make_default_config():
     bowtie2_fp = distutils.spawn.find_executable("bowtie2")
     if bowtie2_fp is not None:
         config.update({"bowtie2_fp": bowtie2_fp})
+
+    if user_config_file is None:
+        default_user_config_fp = os.path.expanduser("~/.phylogenetic_profiler.json")
+        if os.path.exists(default_user_config_fp):
+            user_config_file = open(default_user_config_fp)
+
+    if user_config_file is not None:
+        user_config = json.load(user_config_file)
+        config.update(user_config)
+
     return config
 
 
@@ -96,10 +106,7 @@ def main(argv=None):
         help="JSON configuration file")
     args = parser.parse_args(argv)
 
-    config = make_default_config()
-    if args.config_file:
-        user_config = json.load(args.config_file)
-        config.update(user_config)
+    config = get_config(args.config_file)
 
     fwd_fp = args.forward_reads.name
     rev_fp = args.reverse_reads.name
