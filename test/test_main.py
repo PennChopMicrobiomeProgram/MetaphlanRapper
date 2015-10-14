@@ -4,7 +4,29 @@ import shutil
 import tempfile
 import unittest
 
-from phyloprofilerlib.main import Metaphlan, main
+from phyloprofilerlib.main import (
+    Metaphlan, main, get_config,
+)
+
+
+class ConfigTests(unittest.TestCase):
+        def setUp(self):
+            self.temp_home_dir = tempfile.mkdtemp()
+            self._old_home_dir = os.environ['HOME']
+            os.environ['HOME'] = self.temp_home_dir
+
+        def tearDown(self):
+            shutil.rmtree(self.temp_home_dir)
+            os.environ['HOME'] = self._old_home_dir
+
+        def test_default_config_locataion(self):
+            """Config file in user home dir should be read and used"""
+            user_config_fp = os.path.join(
+                self.temp_home_dir, ".phylogenetic_profiler.json")
+            with open(user_config_fp, "w") as f:
+                f.write('{"bowtie2_fp": "SOMECRAZYVALUE"}')
+            config = get_config(None)
+            self.assertEqual(config["bowtie2_fp"], u"SOMECRAZYVALUE")
 
 
 class MetaphlanWrapperTest(unittest.TestCase):
