@@ -47,23 +47,28 @@ class Metaphlan(object):
     def __init__(self, config):
         self.config = config
 
-    def make_command(self, R1, R2):
+    def make_command(self, R1, R2, out_dir):
         return [
             "python", self.config["metaphlan_fp"],
             "%s,%s" %(R1, R2),
             "--mpa_pkl", self.config["mpa_pkl"],
             "--bowtie2db", self.config["bowtie2db"],
             "--bowtie2_exe", self.config["bowtie2_fp"],
-            "--no_map",
-            "--input_type", "fastq"]
+            "--bowtie2out", self.make_db_out_fp(R1, out_dir),
+            "--input_type", "fastq"] #,
+            #"--tmp_dir", "/mnt/lustre/users/tanesc"]
+    
+    def make_db_out_fp(self, R1, out_dir):
+        return os.path.join(out_dir, "%s.bowtie2" % os.path.splitext(os.path.basename(R1))[0])
     
     def make_output_handle(self, R1, out_dir):
         return open(os.path.join(out_dir, "%s.txt" % os.path.splitext(os.path.basename(R1))[0]), 'w')
 
     def run(self, R1, R2, out_dir):
-        command = self.make_command(R1, R2)
+        command = self.make_command(R1, R2, out_dir)
         output = subprocess.check_output(command)
         revised_output = self.revise_output(output)
+        #revised_output = output
         with self.make_output_handle(R1, out_dir) as f:
             f.write(revised_output)
 
