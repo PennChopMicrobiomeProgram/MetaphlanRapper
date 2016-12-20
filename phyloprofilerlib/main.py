@@ -14,6 +14,7 @@ def get_config(user_config_file):
         "mpa_pkl": "mpa_v20_m200.pkl",
         "bowtie2db": "mpa_v20_m200",
         "bowtie2_fp": "bowtie2",
+        "temp_dir": ""
     }
     metaphlan_fp = distutils.spawn.find_executable("metaphlan2.py")
     if metaphlan_fp is not None:
@@ -55,8 +56,8 @@ class Metaphlan(object):
             "--bowtie2db", self.config["bowtie2db"],
             "--bowtie2_exe", self.config["bowtie2_fp"],
             "--bowtie2out", self.make_db_out_fp(R1, out_dir),
-            "--input_type", "fastq"] #,
-            #"--tmp_dir", "/mnt/lustre/users/tanesc"]
+            "--input_type", "fastq" ,
+            "--tmp_dir", self.config["temp_dir"] ]
     
     def make_db_out_fp(self, R1, out_dir):
         return os.path.join(out_dir, "%s.bowtie2" % os.path.splitext(os.path.basename(R1))[0])
