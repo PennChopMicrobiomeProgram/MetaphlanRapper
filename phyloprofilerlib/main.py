@@ -14,7 +14,7 @@ def get_config(user_config_file):
         "mpa_pkl": "mpa_v20_m200.pkl",
         "bowtie2db": "mpa_v20_m200",
         "bowtie2_fp": "bowtie2",
-        "temp_dir": ""
+        "temp_dir": "/tmp"
     }
     metaphlan_fp = distutils.spawn.find_executable("metaphlan2.py")
     if metaphlan_fp is not None:
@@ -84,7 +84,7 @@ class Metaphlan(object):
             header = output_lines.pop(0)
             revised_output_lines = [header]
             for line in output_lines:
-                if ("s__" in line) and not ("t__" in line):
+                if (("s__" in line) and not ("t__" in line)) or (("unclassified" in line) and not ("t__" in line)):
                     revised_output_lines.append(line)
             return "".join(revised_output_lines)
 
