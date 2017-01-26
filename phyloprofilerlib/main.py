@@ -14,6 +14,7 @@ def get_config(user_config_file):
         "mpa_pkl": "mpa_v20_m200.pkl",
         "bowtie2db": "mpa_v20_m200",
         "bowtie2_fp": "bowtie2",
+        "temp_dir": "/tmp"
     }
     metaphlan_fp = distutils.spawn.find_executable("metaphlan2.py")
     if metaphlan_fp is not None:
@@ -47,23 +48,28 @@ class Metaphlan(object):
     def __init__(self, config):
         self.config = config
 
-    def make_command(self, R1, R2):
+    def make_command(self, R1, R2, out_dir):
         return [
             "python", self.config["metaphlan_fp"],
             "%s,%s" %(R1, R2),
             "--mpa_pkl", self.config["mpa_pkl"],
             "--bowtie2db", self.config["bowtie2db"],
             "--bowtie2_exe", self.config["bowtie2_fp"],
-            "--no_map",
-            "--input_type", "fastq"]
+            "--bowtie2out", self.make_db_out_fp(R1, out_dir),
+            "--input_type", "fastq" ,
+            "--tmp_dir", self.config["temp_dir"] ]
+    
+    def make_db_out_fp(self, R1, out_dir):
+        return os.path.join(out_dir, "%s.bowtie2" % os.path.splitext(os.path.basename(R1))[0])
     
     def make_output_handle(self, R1, out_dir):
         return open(os.path.join(out_dir, "%s.txt" % os.path.splitext(os.path.basename(R1))[0]), 'w')
 
     def run(self, R1, R2, out_dir):
-        command = self.make_command(R1, R2)
+        command = self.make_command(R1, R2, out_dir)
         output = subprocess.check_output(command)
         revised_output = self.revise_output(output)
+        #revised_output = output
         with self.make_output_handle(R1, out_dir) as f:
             f.write(revised_output)
 
@@ -78,7 +84,7 @@ class Metaphlan(object):
             header = output_lines.pop(0)
             revised_output_lines = [header]
             for line in output_lines:
-                if ("s__" in line) and not ("t__" in line):
+                if (("s__" in line) and not ("t__" in line)) or (("unclassified" in line) and not ("t__" in line)):
                     revised_output_lines.append(line)
             return "".join(revised_output_lines)
 
